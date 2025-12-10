@@ -65,7 +65,8 @@ uint16_t
 
 uint32_t
 	canTxMailbox,
-	enderecoCPU = ENDERECO_CAN_CPU_PADRAO;
+	enderecoCPU = ENDERECO_CAN_CPU_PADRAO,
+	enderecoResposta = ENDERECO_CAN_RESPOSTA_PADRAO;
 
 uint8_t
 	canTxBuffer[8],

@@ -15,14 +15,17 @@ LEITURA DIP SWITCH
 void leituraDipSwitch() {
 	if(!input(SW1_GPIO_Port, SW1_Pin)) {
 		enderecoCPU ++;
+		enderecoResposta ++;
 	}
 
 	if(!input(SW2_GPIO_Port, SW2_Pin)) {
 		enderecoCPU += 2;
+		enderecoResposta += 2;
 	}
 
 	if(!input(SW3_GPIO_Port, SW3_Pin)) {
 		enderecoCPU += 4;
+		enderecoResposta += 4;
 	}
 }
 /*==============================================================================

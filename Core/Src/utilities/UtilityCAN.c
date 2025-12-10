@@ -26,13 +26,15 @@ void recebePacoteCAN() {
 ENVIA PACOTE CAN
 ==============================================================================*/
 void enviaPacoteCAN() {
-	//Por enquanto não há dados a serem transmitidos pela CAN
-	/*
-	canTxHeader.ExtId = HIDRA_ADDRESS;
+	canTxHeader.ExtId = enderecoResposta;
 	canTxHeader.RTR = CAN_RTR_DATA;
 	canTxHeader.IDE = CAN_ID_EXT;
 	canTxHeader.DLC = 8;
 	canTxHeader.TransmitGlobalTime = DISABLE;
+
+	for(uint8_t i = 0; i < 8; i ++) { //não há dados a serem enviados por hora
+		canTxBuffer[i] = 0x00;
+	}
 
 	if(HAL_CAN_AddTxMessage(&hcan, &canTxHeader, canTxBuffer, &canTxMailbox) != HAL_OK) {
 	    Error_Handler();
@@ -40,7 +42,7 @@ void enviaPacoteCAN() {
 
 	while(HAL_CAN_GetTxMailboxesFreeLevel(&hcan) != 3) {
 		//Aguarda fim da transmissão
-	}*/
+	}
 }
 /*==============================================================================
 FIM DO ARQUIVO

@@ -16,6 +16,7 @@ enum BOOL {
 };
 
 #define ENDERECO_CAN_CPU_PADRAO 0x132F7890
+#define ENDERECO_CAN_RESPOSTA_PADRAO 0x132A7890
 
 #define VALOR_MAXIMO_MOTOR 4095
 #define VALOR_75_MOTOR ((VALOR_MAXIMO_MOTOR * 3) / 4)
@@ -25,6 +26,7 @@ enum BOOL {
 extern CAN_TxHeaderTypeDef	canTxHeader;
 extern CAN_RxHeaderTypeDef	canRxHeader;
 
+extern CAN_HandleTypeDef hcan;
 
 extern uint8_t
 	flagPacoteCAN,
@@ -38,7 +40,8 @@ extern uint16_t
 
 extern uint32_t
 	canTxMailbox,
-	enderecoCPU;
+	enderecoCPU,
+	enderecoResposta;
 
 extern uint8_t
 	canTxBuffer[8],

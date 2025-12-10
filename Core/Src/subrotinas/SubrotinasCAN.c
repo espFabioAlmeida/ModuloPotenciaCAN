@@ -19,6 +19,8 @@ void protocoloCAN() {
 
 	flagMotorLigado = false;
 	valorMotor = 0;
+
+	enviaPacoteCAN();
 }
 /*==============================================================================
 FIM DO ARQUIVO

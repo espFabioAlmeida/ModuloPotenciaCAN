@@ -8,6 +8,7 @@ O endereço é selecionado pelas 3 entradas no conector. SW1 -> SW3. A SW4 (resi
 
 # Protocolo CAN
 Endereço CPU: 0x132F7890 => Os últimos 2 dígitos refere-se ao endereço. Podendo ser do 90 ao 97. <br>
+Endereço Resposta: 0x132A7890 => Os últimos 2 dígitos refere-se ao endereço. Podendo ser do 90 ao 97. <br>
 <br>
 BYTE 0: Motor Ligado 0 ou 1 <br>
 BYTE 1: High Byte valor PWM <br>
