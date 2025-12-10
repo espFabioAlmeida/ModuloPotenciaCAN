@@ -22,7 +22,14 @@ enum BOOL {
 #define VALOR_50_MOTOR (VALOR_MAXIMO_MOTOR / 2)
 #define VALOR_25_MOTOR (VALOR_MAXIMO_MOTOR / 4)
 
+extern CAN_TxHeaderTypeDef	canTxHeader;
+extern CAN_RxHeaderTypeDef	canRxHeader;
+
+
 extern uint8_t
+	flagPacoteCAN,
+	flagLedCOM,
+
 	flagMotorLigado,
 	flagAtualizaMotor;
 
@@ -30,6 +37,10 @@ extern uint16_t
 	valorMotor;
 
 extern uint32_t
+	canTxMailbox,
 	enderecoCPU;
 
+extern uint8_t
+	canTxBuffer[8],
+	canRxBuffer[8];
 #endif /* INC_GLOBAL_H_ */

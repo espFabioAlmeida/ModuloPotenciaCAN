@@ -50,14 +50,26 @@ TIM_HandleTypeDef htim14;
 
 /* USER CODE BEGIN PV */
 
+CAN_TxHeaderTypeDef	canTxHeader;
+CAN_RxHeaderTypeDef	canRxHeader;
+
 uint8_t
+	flagPacoteCAN = false,
+	flagLedCOM = false,
+
 	flagMotorLigado = false,
 	flagAtualizaMotor = false;
 
 uint16_t
 	valorMotor = 0;
 
-uint32_t enderecoCPU = ENDERECO_CAN_CPU_PADRAO;
+uint32_t
+	canTxMailbox,
+	enderecoCPU = ENDERECO_CAN_CPU_PADRAO;
+
+uint8_t
+	canTxBuffer[8],
+	canRxBuffer[8];
 
 /* USER CODE END PV */
 
@@ -75,6 +87,12 @@ static void MX_TIM14_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hCan) {
+	if(hCan == &hcan) {
+		HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &canRxHeader, canRxBuffer);
+		flagPacoteCAN = true;
+	}
+}
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if(htim == &htim3) {
@@ -137,6 +155,10 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim3); //Timer do Scheduller
   HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1); //Timer da PWM
 
+  HAL_CAN_Start(&hcan);
+  HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
+  //Alterações no CAN INIT
+
   atualizaPWM(0);
   leituraDipSwitch();
 
@@ -147,6 +169,7 @@ int main(void)
   while (1)
   {
 	  atualizaMotor();
+	  recebePacoteCAN();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -198,6 +221,13 @@ static void MX_CAN_Init(void)
 {
 
   /* USER CODE BEGIN CAN_Init 0 */
+	//calculo da configuração de velocidade
+	//http://www.bittiming.can-wiki.info/
+	//Selecionar ST e colocar a velocidade do clock (do APB1 ou do barramento correspondente a CAN)
+	//gerar tabela e pegar os calores de prescaler, seg1 e seg2
+	CAN_FilterTypeDef  sFilterConfig; //Inserido
+
+	//hcan.Init.AutoRetransmission = ENABLE; --> Deve estar em ENABLE
 
   /* USER CODE END CAN_Init 0 */
 
@@ -205,15 +235,15 @@ static void MX_CAN_Init(void)
 
   /* USER CODE END CAN_Init 1 */
   hcan.Instance = CAN;
-  hcan.Init.Prescaler = 16;
+  hcan.Init.Prescaler = 6;
   hcan.Init.Mode = CAN_MODE_NORMAL;
   hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan.Init.TimeSeg1 = CAN_BS1_1TQ;
-  hcan.Init.TimeSeg2 = CAN_BS2_1TQ;
+  hcan.Init.TimeSeg1 = CAN_BS1_13TQ;
+  hcan.Init.TimeSeg2 = CAN_BS2_2TQ;
   hcan.Init.TimeTriggeredMode = DISABLE;
   hcan.Init.AutoBusOff = DISABLE;
   hcan.Init.AutoWakeUp = DISABLE;
-  hcan.Init.AutoRetransmission = DISABLE;
+  hcan.Init.AutoRetransmission = ENABLE;
   hcan.Init.ReceiveFifoLocked = DISABLE;
   hcan.Init.TransmitFifoPriority = DISABLE;
   if (HAL_CAN_Init(&hcan) != HAL_OK)
@@ -221,6 +251,27 @@ static void MX_CAN_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CAN_Init 2 */
+
+  //Inserido abaixo
+
+  sFilterConfig.FilterBank = 0;
+  sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+  sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+  sFilterConfig.FilterIdHigh = 0x0000;
+  sFilterConfig.FilterIdLow = 0x0000;
+  sFilterConfig.FilterMaskIdHigh = 0x0000;
+  sFilterConfig.FilterMaskIdLow = 0x0000;
+  sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+  sFilterConfig.FilterActivation = ENABLE;
+  sFilterConfig.SlaveStartFilterBank = 14;
+
+  if(HAL_CAN_ConfigFilter(&hcan, &sFilterConfig) != HAL_OK) {
+	  Error_Handler();
+  }
+
+  if(HAL_CAN_Start(&hcan) != HAL_OK) {
+	  Error_Handler();
+  }
 
   /* USER CODE END CAN_Init 2 */
 

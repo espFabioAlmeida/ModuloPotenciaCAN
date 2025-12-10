@@ -34,6 +34,13 @@ void tarefas100ms() {
 
 	flagAtualizaMotor = true;
 
+	if(flagLedCOM) {
+		flagLedCOM = false;
+		off(LED_COM_GPIO_Port, LED_COM_Pin);
+	}
+	else {
+		on(LED_COM_GPIO_Port, LED_COM_Pin);
+	}
 
 	if(flagMotorLigado) {
 		contaPiscaLed ++;
