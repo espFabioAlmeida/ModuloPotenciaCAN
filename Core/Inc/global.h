@@ -15,4 +15,10 @@ enum BOOL {
 	true
 };
 
+#define ENDERECO_CAN_CPU_PADRAO 0x132F7890
+
+
+extern uint32_t
+	enderecoCPU;
+
 #endif /* INC_GLOBAL_H_ */

@@ -50,6 +50,8 @@ TIM_HandleTypeDef htim14;
 
 /* USER CODE BEGIN PV */
 
+uint32_t enderecoCPU = ENDERECO_CAN_CPU_PADRAO;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -120,6 +122,8 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
+
+  leituraDipSwitch();
 
   /* USER CODE END 2 */
 
