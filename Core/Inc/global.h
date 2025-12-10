@@ -16,7 +16,14 @@ enum BOOL {
 };
 
 #define ENDERECO_CAN_CPU_PADRAO 0x132F7890
+#define VALOR_MAXIMO_MOTOR 4095
 
+extern uint8_t
+	flagMotorLigado,
+	flagAtualizaMotor;
+
+extern uint16_t
+	valorMotor;
 
 extern uint32_t
 	enderecoCPU;

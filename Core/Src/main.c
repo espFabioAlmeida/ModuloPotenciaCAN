@@ -50,6 +50,13 @@ TIM_HandleTypeDef htim14;
 
 /* USER CODE BEGIN PV */
 
+uint8_t
+	flagMotorLigado = false,
+	flagAtualizaMotor = false;
+
+uint16_t
+	valorMotor = 0;
+
 uint32_t enderecoCPU = ENDERECO_CAN_CPU_PADRAO;
 
 /* USER CODE END PV */
@@ -83,6 +90,10 @@ void delayMicro(uint32_t tempo) {
 
 void reiniciaWatchDog() {
 	HAL_IWDG_Refresh(&hiwdg);
+}
+
+void atualizaPWM(uint16_t carga) {
+	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, carga);
 }
 
 /* USER CODE END 0 */
@@ -122,7 +133,11 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start(&htim2); //Timer do delay us
+  HAL_TIM_Base_Start_IT(&htim3); //Timer do Scheduller
+  HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1); //Timer da PWM
 
+  atualizaPWM(0);
   leituraDipSwitch();
 
   /* USER CODE END 2 */
@@ -131,6 +146,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  atualizaMotor();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

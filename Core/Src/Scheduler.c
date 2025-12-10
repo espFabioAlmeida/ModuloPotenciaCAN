@@ -30,6 +30,7 @@ TAREFAS 100ms
 void tarefas100ms() {
 	reiniciaWatchDog();
 
+	flagAtualizaMotor = true;
 }
 /*==============================================================================
 TAREFAS 1s
