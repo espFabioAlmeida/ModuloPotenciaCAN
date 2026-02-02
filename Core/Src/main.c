@@ -60,13 +60,14 @@ uint8_t
 	flagMotorLigado = false,
 	flagAtualizaMotor = false;
 
+uint8_t
+	enderecoModulo = ENDERECO_MODULO_PADRAO;
+
 uint16_t
 	valorMotor = 0;
 
 uint32_t
-	canTxMailbox,
-	enderecoCPU = ENDERECO_CAN_CPU_PADRAO,
-	enderecoResposta = ENDERECO_CAN_RESPOSTA_PADRAO;
+	canTxMailbox;
 
 uint8_t
 	canTxBuffer[8],

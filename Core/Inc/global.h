@@ -15,8 +15,7 @@ enum BOOL {
 	true
 };
 
-#define ENDERECO_CAN_CPU_PADRAO 0x132F7890
-#define ENDERECO_CAN_RESPOSTA_PADRAO 0x132A7890
+#define ENDERECO_MODULO_PADRAO	90
 
 #define VALOR_MAXIMO_MOTOR 4095
 #define VALOR_75_MOTOR ((VALOR_MAXIMO_MOTOR * 3) / 4)
@@ -35,13 +34,14 @@ extern uint8_t
 	flagMotorLigado,
 	flagAtualizaMotor;
 
+extern uint8_t
+	enderecoModulo;
+
 extern uint16_t
 	valorMotor;
 
 extern uint32_t
-	canTxMailbox,
-	enderecoCPU,
-	enderecoResposta;
+	canTxMailbox;
 
 extern uint8_t
 	canTxBuffer[8],

@@ -9,6 +9,10 @@
 /*==============================================================================
 CONSTANTES
 ==============================================================================*/
+#define ENDERECO_ECU_PACOTE_1		0x1BB81A01
+#define ENDERECO_ECU_PACOTE_2		0x1BB81A02
+#define ENDERECO_ECU_PACOTE_3		0x1BB81A03
+#define ENDERECO_RESPOSTA_PADRAO	0x1E30FC90
 /*==============================================================================
 RECEBE PACOTE CAN
 ==============================================================================*/
@@ -16,7 +20,11 @@ void recebePacoteCAN() {
 	if(flagPacoteCAN) {
 		flagPacoteCAN = false;
 
-		if(canRxHeader.ExtId == enderecoCPU) {
+		if(enderecoModulo <= 93 && canRxHeader.ExtId == ENDERECO_ECU_PACOTE_1) {
+			protocoloCAN();
+			flagLedCOM = true;
+		}
+		else if(enderecoModulo <= 97 && canRxHeader.ExtId == ENDERECO_ECU_PACOTE_2) {
 			protocoloCAN();
 			flagLedCOM = true;
 		}
@@ -26,7 +34,9 @@ void recebePacoteCAN() {
 ENVIA PACOTE CAN
 ==============================================================================*/
 void enviaPacoteCAN() {
-	canTxHeader.ExtId = enderecoResposta;
+	uint8_t endereco = enderecoModulo - ENDERECO_MODULO_PADRAO;
+
+	canTxHeader.ExtId = ENDERECO_RESPOSTA_PADRAO + endereco;
 	canTxHeader.RTR = CAN_RTR_DATA;
 	canTxHeader.IDE = CAN_ID_EXT;
 	canTxHeader.DLC = 8;
