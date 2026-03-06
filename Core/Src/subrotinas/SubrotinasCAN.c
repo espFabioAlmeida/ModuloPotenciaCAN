@@ -39,8 +39,6 @@ void protocoloCAN() {
 	else {
 		flagMotorLigado = false;
 	}
-
-	enviaPacoteCAN();
 }
 /*==============================================================================
 FIM DO ARQUIVO
