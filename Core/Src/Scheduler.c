@@ -69,6 +69,11 @@ void tarefas100ms() {
 			toggle(LED_CPU_GPIO_Port, LED_CPU_Pin);
 		}
 	}
+
+	contadorTimeoutAtualizacao ++;
+	if(contadorTimeoutAtualizacao > TIMEOUT_ATUALIZACAO) {
+		contadorTimeoutAtualizacao = TIMEOUT_ATUALIZACAO;
+	}
 }
 /*==============================================================================
 TAREFAS 1s

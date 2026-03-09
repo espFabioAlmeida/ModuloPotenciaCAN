@@ -18,6 +18,8 @@ enum BOOL {
 #define ENDERECO_MODULO_PADRAO	90
 
 #define TIMEOUT_ENVIA_CAN 20
+#define TIMEOUT_ATUALIZACAO 620
+
 #define VALOR_MAXIMO_MOTOR 4095
 #define VALOR_75_MOTOR ((VALOR_MAXIMO_MOTOR * 3) / 4)
 #define VALOR_50_MOTOR (VALOR_MAXIMO_MOTOR / 2)
@@ -41,7 +43,8 @@ extern uint8_t
 	contadorEnviaCAN;
 
 extern uint16_t
-	valorMotor;
+	valorMotor,
+	contadorTimeoutAtualizacao;
 
 extern uint32_t
 	canTxMailbox;

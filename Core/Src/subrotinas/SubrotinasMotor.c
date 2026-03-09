@@ -18,6 +18,11 @@ void atualizaMotor() {
 	}
 	flagAtualizaMotor = false;
 
+	if(contadorTimeoutAtualizacao >= TIMEOUT_ATUALIZACAO) {
+		valorMotor = 0;
+		flagMotorLigado = false;
+	}
+
 	if(flagMotorLigado) {
 		if(valorMotor > VALOR_MAXIMO_MOTOR) {
 			atualizaPWM(0);

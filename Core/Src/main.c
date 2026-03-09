@@ -66,7 +66,8 @@ uint8_t
 	contadorEnviaCAN = 0;
 
 uint16_t
-	valorMotor = 0;
+	valorMotor = 0,
+	contadorTimeoutAtualizacao = 0;
 
 uint32_t
 	canTxMailbox;

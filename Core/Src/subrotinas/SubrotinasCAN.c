@@ -33,6 +33,8 @@ void protocoloCAN() {
 			break;
 	}
 
+	contadorTimeoutAtualizacao = 0;
+
 	if(valorMotor) {
 		flagMotorLigado = true;
 	}
