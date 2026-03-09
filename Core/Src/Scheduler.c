@@ -28,11 +28,10 @@ void tarefas10ms() {
 TAREFAS 100ms
 ==============================================================================*/
 void tarefas100ms() {
-	static uint8_t contaPiscaLed = 0;
+	static uint8_t contaPiscaLed = 0, conta500ms = 0;
 	uint8_t comparacaoContaPiscaLed = 0;
 	reiniciaWatchDog();
 
-	flagAtualizaMotor = true;
 
 	if(flagLedCOM) {
 		flagLedCOM = false;
@@ -62,6 +61,12 @@ void tarefas100ms() {
 			contaPiscaLed = 0;
 			toggle(LED_CPU_GPIO_Port, LED_CPU_Pin);
 		}
+	}
+
+	conta500ms ++;
+	if(conta500ms >= 5) {
+		conta500ms = 0;
+		flagAtualizaMotor = true;
 	}
 }
 /*==============================================================================

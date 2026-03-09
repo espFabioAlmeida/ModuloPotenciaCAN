@@ -20,13 +20,26 @@ void recebePacoteCAN() {
 	if(flagPacoteCAN) {
 		flagPacoteCAN = false;
 
-		if(enderecoModulo <= 93 && canRxHeader.ExtId == ENDERECO_ECU_PACOTE_1) {
-			protocoloCAN();
-			flagLedCOM = true;
-		}
-		else if(enderecoModulo <= 97 && canRxHeader.ExtId == ENDERECO_ECU_PACOTE_2) {
-			protocoloCAN();
-			flagLedCOM = true;
+		switch(enderecoModulo) {
+			case 90:
+			case 91:
+			case 92:
+			case 93:
+				if(canRxHeader.ExtId == ENDERECO_ECU_PACOTE_1) {
+					protocoloCAN();
+					flagLedCOM = true;
+				}
+				break;
+
+			case 94:
+			case 95:
+			case 96:
+			case 97:
+				if(canRxHeader.ExtId == ENDERECO_ECU_PACOTE_2) {
+					protocoloCAN();
+					flagLedCOM = true;
+				}
+				break;
 		}
 	}
 }
