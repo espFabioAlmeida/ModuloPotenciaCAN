@@ -61,8 +61,8 @@ Pacote 3: Não é relevante para esse equipamento <br>
 Endereço Resposta: 0x132A7890 => Os últimos 2 dígitos refere-se ao endereço. Podendo ser do 90 ao 97. <br>
 <br>
 BYTE 0: Motor Ligado 0 ou 1 <br>
-BYTE 1: High Byte valor PWM <br>
-BYTE 2: Low Byte valor PWM <br>
+BYTE 1: Low Byte valor PWM <br>
+BYTE 2: High Byte valor PWM <br>
 BYTE 3: Livre <br>
 BYTE 4: Livre <br>
 BYTE 5: Livre <br>

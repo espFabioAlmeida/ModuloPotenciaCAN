@@ -49,22 +49,33 @@ ENVIA PACOTE CAN
 void enviaPacoteCAN() {
 	uint8_t endereco = enderecoModulo - ENDERECO_MODULO_PADRAO;
 
+	if(!flagEnviaPacoteCAN) {
+		return;
+	}
+
+	if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan) != 3) {
+		return; //porta ocupada
+	}
+
+	flagEnviaPacoteCAN = false;
+
 	canTxHeader.ExtId = ENDERECO_RESPOSTA_PADRAO + endereco;
 	canTxHeader.RTR = CAN_RTR_DATA;
 	canTxHeader.IDE = CAN_ID_EXT;
 	canTxHeader.DLC = 8;
 	canTxHeader.TransmitGlobalTime = DISABLE;
 
-	for(uint8_t i = 0; i < 8; i ++) { //não há dados a serem enviados por hora
-		canTxBuffer[i] = 0x00;
-	}
+	canTxBuffer[0] = flagMotorLigado;
+	canTxBuffer[1] = make8(valorMotor, 0);
+	canTxBuffer[2] = make8(valorMotor, 1);
+	canTxBuffer[3] = 0;
+	canTxBuffer[4] = 0;
+	canTxBuffer[5] = 0;
+	canTxBuffer[6] = 0;
+	canTxBuffer[7] = 0;
 
 	if(HAL_CAN_AddTxMessage(&hcan, &canTxHeader, canTxBuffer, &canTxMailbox) != HAL_OK) {
 	    Error_Handler();
-	}
-
-	while(HAL_CAN_GetTxMailboxesFreeLevel(&hcan) != 3) {
-		//Aguarda fim da transmissão
 	}
 }
 /*==============================================================================

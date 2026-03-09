@@ -17,6 +17,7 @@ enum BOOL {
 
 #define ENDERECO_MODULO_PADRAO	90
 
+#define TIMEOUT_ENVIA_CAN 20
 #define VALOR_MAXIMO_MOTOR 4095
 #define VALOR_75_MOTOR ((VALOR_MAXIMO_MOTOR * 3) / 4)
 #define VALOR_50_MOTOR (VALOR_MAXIMO_MOTOR / 2)
@@ -29,13 +30,15 @@ extern CAN_HandleTypeDef hcan;
 
 extern uint8_t
 	flagPacoteCAN,
+	flagEnviaPacoteCAN,
 	flagLedCOM,
 
 	flagMotorLigado,
 	flagAtualizaMotor;
 
 extern uint8_t
-	enderecoModulo;
+	enderecoModulo,
+	contadorEnviaCAN;
 
 extern uint16_t
 	valorMotor;

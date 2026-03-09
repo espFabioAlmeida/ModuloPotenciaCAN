@@ -55,13 +55,15 @@ CAN_RxHeaderTypeDef	canRxHeader;
 
 uint8_t
 	flagPacoteCAN = false,
+	flagEnviaPacoteCAN = false,
 	flagLedCOM = false,
 
 	flagMotorLigado = false,
 	flagAtualizaMotor = false;
 
 uint8_t
-	enderecoModulo = ENDERECO_MODULO_PADRAO;
+	enderecoModulo = ENDERECO_MODULO_PADRAO,
+	contadorEnviaCAN = 0;
 
 uint16_t
 	valorMotor = 0;
@@ -172,6 +174,7 @@ int main(void)
   {
 	  atualizaMotor();
 	  recebePacoteCAN();
+	  enviaPacoteCAN();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
