@@ -58,7 +58,7 @@ BYTE 6: LSB PWM MODULO POTÊNCIA 97 <br>
 BYTE 7: MSB PWM MODULO POTÊNCIA 97 <br>
 <br>
 Pacote 3: Não é relevante para esse equipamento <br>
-Endereço Resposta: 0x132A7890 => Os últimos 2 dígitos refere-se ao endereço. Podendo ser do 90 ao 97. <br>
+Endereço Resposta: 0x1E30FC90 => Os últimos 2 dígitos refere-se ao endereço. Podendo ser do 90 ao 97. <br>
 <br>
 BYTE 0: Motor Ligado 0 ou 1 <br>
 BYTE 1: Low Byte valor PWM <br>
