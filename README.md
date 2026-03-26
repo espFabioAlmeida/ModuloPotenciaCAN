@@ -63,8 +63,8 @@ Endereço Resposta: 0x1E30FC90 => Os últimos 2 dígitos refere-se ao endereço.
 BYTE 0: Motor Ligado 0 ou 1 <br>
 BYTE 1: Low Byte valor PWM <br>
 BYTE 2: High Byte valor PWM <br>
-BYTE 3: Livre <br>
-BYTE 4: Livre <br>
+BYTE 3: Low Byte Frequencia Entrada <br>
+BYTE 4: High Byte Frequencia Entrada <br>
 BYTE 5: Livre <br>
 BYTE 6: Livre <br>
 BYTE 7: Livre <br>

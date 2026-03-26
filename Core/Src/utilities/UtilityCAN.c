@@ -68,8 +68,8 @@ void enviaPacoteCAN() {
 	canTxBuffer[0] = flagMotorLigado;
 	canTxBuffer[1] = make8(valorMotor, 0);
 	canTxBuffer[2] = make8(valorMotor, 1);
-	canTxBuffer[3] = 0;
-	canTxBuffer[4] = 0;
+	canTxBuffer[3] = make8(frequenciaEntrada, 0);
+	canTxBuffer[4] = make8(frequenciaEntrada, 1);
 	canTxBuffer[5] = 0;
 	canTxBuffer[6] = 0;
 	canTxBuffer[7] = 0;

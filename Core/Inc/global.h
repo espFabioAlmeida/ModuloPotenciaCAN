@@ -44,7 +44,8 @@ extern uint8_t
 
 extern uint16_t
 	valorMotor,
-	contadorTimeoutAtualizacao;
+	contadorTimeoutAtualizacao,
+	frequenciaEntrada;
 
 extern uint32_t
 	canTxMailbox;
