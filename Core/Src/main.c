@@ -46,9 +46,37 @@ IWDG_HandleTypeDef hiwdg;
 
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim6;
 TIM_HandleTypeDef htim14;
 
 /* USER CODE BEGIN PV */
+
+CAN_TxHeaderTypeDef	canTxHeader;
+CAN_RxHeaderTypeDef	canRxHeader;
+
+uint8_t
+	flagPacoteCAN = false,
+	flagEnviaPacoteCAN = false,
+	flagLedCOM = false,
+
+	flagMotorLigado = false,
+	flagAtualizaMotor = false;
+
+uint8_t
+	enderecoModulo = ENDERECO_MODULO_PADRAO,
+	contadorEnviaCAN = 0;
+
+uint16_t
+	valorMotor = 0,
+	contadorTimeoutAtualizacao = 0,
+	frequenciaEntrada = 0;
+
+uint32_t
+	canTxMailbox;
+
+uint8_t
+	canTxBuffer[8],
+	canRxBuffer[8];
 
 /* USER CODE END PV */
 
@@ -60,16 +88,27 @@ static void MX_IWDG_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM14_Init(void);
+static void MX_TIM6_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hCan) {
+	if(hCan == &hcan) {
+		HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &canRxHeader, canRxBuffer);
+		flagPacoteCAN = true;
+	}
+}
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if(htim == &htim3) {
 		schedulerEngine();
+	}
+
+	if(htim == &htim6) {
+		leituraEntradaPulsos();
 	}
 }
 
@@ -81,6 +120,10 @@ void delayMicro(uint32_t tempo) {
 
 void reiniciaWatchDog() {
 	HAL_IWDG_Refresh(&hiwdg);
+}
+
+void atualizaPWM(uint16_t carga) {
+	__HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, carga);
 }
 
 /* USER CODE END 0 */
@@ -119,7 +162,19 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM14_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start(&htim2); //Timer do delay us
+  HAL_TIM_Base_Start_IT(&htim3); //Timer do Scheduller
+  HAL_TIM_Base_Start_IT(&htim6); //Timer do Leitor de Pulsos
+  HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1); //Timer da PWM
+
+  HAL_CAN_Start(&hcan);
+  HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
+  //Alterações no CAN INIT
+
+  atualizaPWM(0);
+  leituraDipSwitch();
 
   /* USER CODE END 2 */
 
@@ -127,6 +182,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  atualizaMotor();
+	  recebePacoteCAN();
+	  enviaPacoteCAN();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -146,10 +204,13 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_LSI;
-  RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL3;
+  RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -159,7 +220,7 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI48;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
 
@@ -178,6 +239,13 @@ static void MX_CAN_Init(void)
 {
 
   /* USER CODE BEGIN CAN_Init 0 */
+	//calculo da configuração de velocidade
+	//http://www.bittiming.can-wiki.info/
+	//Selecionar ST e colocar a velocidade do clock (do APB1 ou do barramento correspondente a CAN)
+	//gerar tabela e pegar os calores de prescaler, seg1 e seg2
+	CAN_FilterTypeDef  sFilterConfig; //Inserido
+
+	//hcan.Init.AutoRetransmission = ENABLE; --> Deve estar em ENABLE
 
   /* USER CODE END CAN_Init 0 */
 
@@ -185,15 +253,15 @@ static void MX_CAN_Init(void)
 
   /* USER CODE END CAN_Init 1 */
   hcan.Instance = CAN;
-  hcan.Init.Prescaler = 16;
+  hcan.Init.Prescaler = 12;
   hcan.Init.Mode = CAN_MODE_NORMAL;
   hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan.Init.TimeSeg1 = CAN_BS1_1TQ;
-  hcan.Init.TimeSeg2 = CAN_BS2_1TQ;
+  hcan.Init.TimeSeg1 = CAN_BS1_13TQ;
+  hcan.Init.TimeSeg2 = CAN_BS2_2TQ;
   hcan.Init.TimeTriggeredMode = DISABLE;
   hcan.Init.AutoBusOff = DISABLE;
   hcan.Init.AutoWakeUp = DISABLE;
-  hcan.Init.AutoRetransmission = DISABLE;
+  hcan.Init.AutoRetransmission = ENABLE;
   hcan.Init.ReceiveFifoLocked = DISABLE;
   hcan.Init.TransmitFifoPriority = DISABLE;
   if (HAL_CAN_Init(&hcan) != HAL_OK)
@@ -201,6 +269,27 @@ static void MX_CAN_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CAN_Init 2 */
+
+  //Inserido abaixo
+
+  sFilterConfig.FilterBank = 0;
+  sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+  sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+  sFilterConfig.FilterIdHigh = 0x0000;
+  sFilterConfig.FilterIdLow = 0x0000;
+  sFilterConfig.FilterMaskIdHigh = 0x0000;
+  sFilterConfig.FilterMaskIdLow = 0x0000;
+  sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+  sFilterConfig.FilterActivation = ENABLE;
+  sFilterConfig.SlaveStartFilterBank = 14;
+
+  if(HAL_CAN_ConfigFilter(&hcan, &sFilterConfig) != HAL_OK) {
+	  Error_Handler();
+  }
+
+  if(HAL_CAN_Start(&hcan) != HAL_OK) {
+	  Error_Handler();
+  }
 
   /* USER CODE END CAN_Init 2 */
 
@@ -326,6 +415,44 @@ static void MX_TIM3_Init(void)
 }
 
 /**
+  * @brief TIM6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM6_Init(void)
+{
+
+  /* USER CODE BEGIN TIM6_Init 0 */
+
+  /* USER CODE END TIM6_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM6_Init 1 */
+
+  /* USER CODE END TIM6_Init 1 */
+  htim6.Instance = TIM6;
+  htim6.Init.Prescaler = 4800-1;
+  htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim6.Init.Period = 10-1;
+  htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM6_Init 2 */
+
+  /* USER CODE END TIM6_Init 2 */
+
+}
+
+/**
   * @brief TIM14 Initialization Function
   * @param None
   * @retval None
@@ -385,6 +512,7 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */

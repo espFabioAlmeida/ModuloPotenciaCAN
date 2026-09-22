@@ -28,14 +28,61 @@ void tarefas10ms() {
 TAREFAS 100ms
 ==============================================================================*/
 void tarefas100ms() {
+	static uint8_t contaPiscaLed = 0;
+	uint8_t comparacaoContaPiscaLed = 0;
 	reiniciaWatchDog();
 
+	flagAtualizaMotor = true;
+
+	contadorEnviaCAN ++;
+	if(contadorEnviaCAN >= TIMEOUT_ENVIA_CAN) {
+		contadorEnviaCAN = 0;
+		flagEnviaPacoteCAN = true;
+	}
+
+	if(flagLedCOM) {
+		flagLedCOM = false;
+		off(LED_COM_GPIO_Port, LED_COM_Pin);
+	}
+	else {
+		on(LED_COM_GPIO_Port, LED_COM_Pin);
+	}
+
+	if(flagMotorLigado) {
+		contaPiscaLed ++;
+
+		if(valorMotor > VALOR_75_MOTOR) {
+			comparacaoContaPiscaLed = 1;
+		}
+		else if(valorMotor > VALOR_50_MOTOR) {
+			comparacaoContaPiscaLed = 3;
+		}
+		else if(valorMotor > VALOR_25_MOTOR) {
+			comparacaoContaPiscaLed = 6;
+		}
+		else {
+			comparacaoContaPiscaLed = 8;
+		}
+
+		if(contaPiscaLed >= comparacaoContaPiscaLed) {
+			contaPiscaLed = 0;
+			toggle(LED_CPU_GPIO_Port, LED_CPU_Pin);
+		}
+	}
+
+	contadorTimeoutAtualizacao ++;
+	if(contadorTimeoutAtualizacao > TIMEOUT_ATUALIZACAO) {
+		contadorTimeoutAtualizacao = TIMEOUT_ATUALIZACAO;
+	}
 }
 /*==============================================================================
 TAREFAS 1s
 ==============================================================================*/
 void tarefas1s() {
-	toggle(LED_CPU_GPIO_Port, LED_CPU_Pin);
+	if(!flagMotorLigado) {
+		toggle(LED_CPU_GPIO_Port, LED_CPU_Pin);
+	}
+
 }
 /*==============================================================================
 SCHEDULER
