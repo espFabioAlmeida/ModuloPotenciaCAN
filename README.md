@@ -5,6 +5,8 @@ Porjeto Automasensor: Módulo Potência CAN <br>
 Possui as mesmas funções do módulo de potência, porém a comunicação é via CAN. <br>
 Recebe o valor do setpoint PWM via CAN e aciona a saída da PWM, valor entre 0 e 4095. <br>
 O endereço é selecionado pelas 3 entradas no conector. SW1 -> SW3. A SW4 (resistor/jumper) não é utilizado por enquanto. <br>
+Leitura do RPM do motor através da entrada digital, configurado para 10 pulsos por revolução e janela de leitura a cada 2s. <br>
+O valor da RPM é apenas informativo, e é enviado pela CAN com um zero deslocado, ou seja: 750 = 75.0RPM. <br>
 
 # Pinagem Conector
 1-OUT MOTOR <br>
@@ -63,8 +65,8 @@ Endereço Resposta: 0x1E30FC90 => Os últimos 2 dígitos refere-se ao endereço.
 BYTE 0: Motor Ligado 0 ou 1 <br>
 BYTE 1: Low Byte valor PWM <br>
 BYTE 2: High Byte valor PWM <br>
-BYTE 3: Low Byte Frequencia Entrada <br>
-BYTE 4: High Byte Frequencia Entrada <br>
+BYTE 3: Low Byte RPM motor <br>
+BYTE 4: High Byte RPM motor <br>
 BYTE 5: Livre <br>
 BYTE 6: Livre <br>
 BYTE 7: Livre <br>

@@ -8,7 +8,7 @@
 #ifndef INC_GLOBAL_H_
 #define INC_GLOBAL_H_
 
-#define VERSAO_FIRMWARE 1
+#define VERSAO_FIRMWARE 2
 
 enum BOOL {
 	false,
@@ -45,7 +45,7 @@ extern uint8_t
 extern uint16_t
 	valorMotor,
 	contadorTimeoutAtualizacao,
-	frequenciaEntrada;
+	rpmMotor;
 
 extern uint32_t
 	canTxMailbox;
