@@ -69,7 +69,7 @@ uint8_t
 uint16_t
 	valorMotor = 0,
 	contadorTimeoutAtualizacao = 0,
-	frequenciaEntrada = 0;
+	rpmMotor = 0;
 
 uint32_t
 	canTxMailbox;
